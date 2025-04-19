@@ -1,0 +1,11 @@
+*.env
+*venv/
+*temp_dir/
+.climate_env
+__pycache__
+vector_store/
+*logs/
+*env/
+*chroma.log
+*.log
+*.sqlite
