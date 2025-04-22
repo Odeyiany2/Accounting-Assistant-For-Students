@@ -15,4 +15,4 @@ For now I am focusing on:
 
 
 ## *Tools and Frameworks**
-1. Language Model: `deepseek-r1-distill-llama-70b` from (Groq)[https://console.groq.com/]. I chose this because of its reasoning capabilities since that is what I am looking to achieve with the assistant. 
+1. **Language Model:** `deepseek-r1-distill-llama-70b` from [Groq](https://console.groq.com/). I chose this because of its reasoning capabilities since that is what I am looking to achieve with the assistant. 
