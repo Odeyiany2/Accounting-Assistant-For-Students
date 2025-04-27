@@ -4,6 +4,7 @@
 #libraries 
 import os
 import pytesseract
+from typing import List
 from dotenv import load_dotenv
 from groq import Groq #language model wrapper for Groq API
 from langchain_community.document_loaders import DirectoryLoader, PyMuPDFLoader, Docx2txtLoader#langchain wrapper for loading documents from a directory
@@ -85,7 +86,7 @@ def extract_text_from_scanned_pdf(file_path):
 
 
 #set up a function to load the documents from a directory 
-def load_documents_from_directory(directory_path):
+def load_documents_from_directory(directory_path:str) -> List[Document]:
     """
     Load documents from a specified directory using PyMuPDFLoader.
     
@@ -98,11 +99,14 @@ def load_documents_from_directory(directory_path):
 
     supported_extensions = ['.pdf', '.docx', '.txt']
 
+
     # Check if the directory exists
     if not os.path.exists(directory_path):
         llm_handler_logger.error(f"Directory {directory_path} does not exist.")
         return []
     
+    all_documents = []
+    # Iterate through all files in the directory
     
     loader = DirectoryLoader(directory_path, glob="**/*.pdf", loader_cls=PyMuPDFLoader)
     documents = loader.load()
