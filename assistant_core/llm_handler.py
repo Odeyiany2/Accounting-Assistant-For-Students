@@ -5,9 +5,10 @@
 import os
 import pytesseract
 from typing import List
+from pathlib import Path
 from dotenv import load_dotenv
 from groq import Groq #language model wrapper for Groq API
-from langchain_community.document_loaders import DirectoryLoader, PyMuPDFLoader, Docx2txtLoader#langchain wrapper for loading documents from a directory
+from langchain_community.document_loaders import TextLoader, PyMuPDFLoader, Docx2txtLoader#langchain wrapper for loading documents from a directory
 from langchain.text_splitter import RecursiveCharacterTextSplitter #langchain wrapper for splitting text into smaller chunks
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain.vectorstores import Chroma 
@@ -107,7 +108,65 @@ def load_documents_from_directory(directory_path:str) -> List[Document]:
     
     all_documents = []
     # Iterate through all files in the directory
+    for subdir, _, files in os.walk(directory_path):
+        subject = Path(subdir).name
+        for file in files:
+            file_path = os.path.join(subdir, file)
+            file_ext = os.path.splitext(file)[1].lower()
+
+            #check if the file extension is supported 
+
+            if file_ext == ".pdf":
+                if is_scanned_pdf(file_path):
+                    print(f"[OCR] Processing scanned PDF: {file}")
+                    llm_handler_logger.info(f"[OCR] Processing scanned PDF: {file}")
+                    # Extract text from scanned PDF using OCR
+                    text = extract_text_from_scanned_pdf(file_path)
+                    if text:
+                        all_documents.append(Document(page_content = text,
+                                                       metadata = {"source":file_path, "subject":subject}))
+
+                else:
+                    try:
+                        print(f"[PDF] Processing PDF: {file}")
+                        llm_handler_logger.info(f"[PDF] Processing PDF: {file}")
+                        #load the pdf file using PyMuPDFLoader
+                        loader = PyMuPDFLoader(file_path=file_path)
+                        docs = loader.load()
+                        for d in docs:
+                            d.metadata["subject"] = subject
+                            all_documents.extend(d)
+                    except Exception as e:
+                        llm_handler_logger.error(f"Error loading PDF file {file_path}, Error: {e}")
+                        continue
+            elif file_ext == ".docx":
+                try:
+                    print(f"[DOCX] Processing DOCX: {file}")
+                    llm_handler_logger.info(f"[DOCX] Processing DOCX: {file}")
+                    #load the docx file using Docx2txtLoader
+                    loader = Docx2txtLoader(file_path=file_path)
+                    docs = loader.load()
+                    for d in docs:
+                        d.metadata["subject"] = subject
+                        all_documents.extend(d)
+                except Exception as e:
+                    llm_handler_logger.error(f"Error loading DOCX file {file_path}, Error: {e}")
+                    continue
+            elif file_ext == ".txt":
+                print(f"[TXT] Processing TXT: {file}")
+                llm_handler_logger.info(f"[TXT] Processing TXT: {file}")
+                #load the txt file using 
+                loader = TextLoader(file_path=file_path, encoding="utf-8")
+                docs = loader.load()
+                for d in docs:
+                    d.metadata["subject"] = subject
+                    all_documents.extend(d)
+            else:
+                llm_handler_logger.warning(f"Unsupported file type: {file_ext}. Skipping file: {file_path}")
+                continue
+    return all_documents
+
+
+
+
     
-    loader = DirectoryLoader(directory_path, glob="**/*.pdf", loader_cls=PyMuPDFLoader)
-    documents = loader.load()
-    return documents
