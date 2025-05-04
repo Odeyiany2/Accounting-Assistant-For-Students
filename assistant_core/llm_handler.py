@@ -3,6 +3,7 @@
 
 #libraries 
 import os
+import pinecone
 import pytesseract
 from typing import List
 from pathlib import Path
@@ -25,6 +26,9 @@ load_dotenv() #load environment variables from .env file
 groq_api_key = os.getenv("GROQ_API_KEY")
 if not groq_api_key:
     raise ValueError("GROQ_API_KEY environment variable not set.")
+
+#set up the Pinecone API key and environment
+pinecone_api_key = os.getenv("PINECONE_API_KEY")
 
 
 # Set up the Groq API client
@@ -169,4 +173,6 @@ def load_documents_from_directory(directory_path:str) -> List[Document]:
 
 
 
-    
+#embedding model 
+def embedding_model():
+    pass 
