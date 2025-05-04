@@ -3,33 +3,26 @@
 
 #libraries 
 import os
-import pinecone
 import pytesseract
 from typing import List
 from pathlib import Path
 from dotenv import load_dotenv
 from groq import Groq #language model wrapper for Groq API
 from langchain_community.document_loaders import TextLoader, PyMuPDFLoader, Docx2txtLoader#langchain wrapper for loading documents from a directory
-from langchain.text_splitter import RecursiveCharacterTextSplitter #langchain wrapper for splitting text into smaller chunks
-from langchain_community.embeddings import HuggingFaceBgeEmbeddings
-from langchain.vectorstores import Chroma 
 from langchain.chains.combine_documents import create_stuff_documents_chain 
 from langchain.chains.retrieval import create_retrieval_chain
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.docstore.document import Document
 from pdf2image import convert_from_path
-from assistant_core.logging import llm_handler_logger
+from config.logging import doc_handler_logger
 
 load_dotenv() #load environment variables from .env file
 
 # Set up the Groq API key
 groq_api_key = os.getenv("GROQ_API_KEY")
 if not groq_api_key:
+    doc_handler_logger.error("GROQ_API_KEY environment variable not set.")
     raise ValueError("GROQ_API_KEY environment variable not set.")
-
-#set up the Pinecone API key and environment
-pinecone_api_key = os.getenv("PINECONE_API_KEY")
-
 
 # Set up the Groq API client
 model = Groq(
@@ -56,7 +49,7 @@ def is_scanned_pdf(file_path):
         content = "".join([doc.page_content for doc in docs])
         return len(content) == 0
     except Exception as e:
-        llm_handler_logger.error(f"""Error loading PDF file - the document contains scanend images {file_path}, 
+        doc_handler_logger.error(f"""Error loading PDF file - the document contains scanend images {file_path}, 
                                  Error: {e}""")
         return True
     
@@ -81,11 +74,11 @@ def extract_text_from_scanned_pdf(file_path):
         for i, image in enumerate(docs):
             page_text = pytesseract.image_to_string(image, lang="eng")
             text += page_text + "\n"
-        llm_handler_logger.info(f"Extracted text from scanned PDF {file_path}")
+        doc_handler_logger.info(f"Extracted text from scanned PDF {file_path}")
         return text
     
     except Exception as e:
-        llm_handler_logger.error(f"""Error extracting text from scanned PDF {file_path}, 
+        doc_handler_logger.error(f"""Error extracting text from scanned PDF {file_path}, 
                                  Error: {e}""")
         return None
 
@@ -107,7 +100,7 @@ def load_documents_from_directory(directory_path:str) -> List[Document]:
 
     # Check if the directory exists
     if not os.path.exists(directory_path):
-        llm_handler_logger.error(f"Directory {directory_path} does not exist.")
+        doc_handler_logger.error(f"Directory {directory_path} does not exist.")
         return []
     
     all_documents = []
@@ -123,7 +116,7 @@ def load_documents_from_directory(directory_path:str) -> List[Document]:
             if file_ext == ".pdf":
                 if is_scanned_pdf(file_path):
                     print(f"[OCR] Processing scanned PDF: {file}")
-                    llm_handler_logger.info(f"[OCR] Processing scanned PDF: {file}")
+                    doc_handler_logger.info(f"[OCR] Processing scanned PDF: {file}")
                     # Extract text from scanned PDF using OCR
                     text = extract_text_from_scanned_pdf(file_path)
                     if text:
@@ -133,7 +126,7 @@ def load_documents_from_directory(directory_path:str) -> List[Document]:
                 else:
                     try:
                         print(f"[PDF] Processing PDF: {file}")
-                        llm_handler_logger.info(f"[PDF] Processing PDF: {file}")
+                        doc_handler_logger.info(f"[PDF] Processing PDF: {file}")
                         #load the pdf file using PyMuPDFLoader
                         loader = PyMuPDFLoader(file_path=file_path)
                         docs = loader.load()
@@ -141,12 +134,12 @@ def load_documents_from_directory(directory_path:str) -> List[Document]:
                             d.metadata["subject"] = subject
                             all_documents.extend(d)
                     except Exception as e:
-                        llm_handler_logger.error(f"Error loading PDF file {file_path}, Error: {e}")
+                        doc_handler_logger.error(f"Error loading PDF file {file_path}, Error: {e}")
                         continue
             elif file_ext == ".docx":
                 try:
                     print(f"[DOCX] Processing DOCX: {file}")
-                    llm_handler_logger.info(f"[DOCX] Processing DOCX: {file}")
+                    doc_handler_logger.info(f"[DOCX] Processing DOCX: {file}")
                     #load the docx file using Docx2txtLoader
                     loader = Docx2txtLoader(file_path=file_path)
                     docs = loader.load()
@@ -154,11 +147,11 @@ def load_documents_from_directory(directory_path:str) -> List[Document]:
                         d.metadata["subject"] = subject
                         all_documents.extend(d)
                 except Exception as e:
-                    llm_handler_logger.error(f"Error loading DOCX file {file_path}, Error: {e}")
+                    doc_handler_logger.error(f"Error loading DOCX file {file_path}, Error: {e}")
                     continue
             elif file_ext == ".txt":
                 print(f"[TXT] Processing TXT: {file}")
-                llm_handler_logger.info(f"[TXT] Processing TXT: {file}")
+                doc_handler_logger.info(f"[TXT] Processing TXT: {file}")
                 #load the txt file using 
                 loader = TextLoader(file_path=file_path, encoding="utf-8")
                 docs = loader.load()
@@ -166,13 +159,7 @@ def load_documents_from_directory(directory_path:str) -> List[Document]:
                     d.metadata["subject"] = subject
                     all_documents.extend(d)
             else:
-                llm_handler_logger.warning(f"Unsupported file type: {file_ext}. Skipping file: {file_path}")
+                doc_handler_logger.warning(f"Unsupported file type: {file_ext}. Skipping file: {file_path}")
                 continue
     return all_documents
 
-
-
-
-#embedding model 
-def embedding_model():
-    pass 

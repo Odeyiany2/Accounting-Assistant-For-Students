@@ -49,8 +49,9 @@ def create_folder_and_log_file(
 folder_name = "logs"
 
 log_files_to_create = [
-    "llm_handler.log",
+    "doc_handler.log",
     "voice_handler.log",
+    "embedding_vec.log",
     "fastapi_app.log"]
 
 for log_file in log_files_to_create:
@@ -58,6 +59,7 @@ for log_file in log_files_to_create:
 
 
 # Set up the loggers for each file
-llm_handler_logger = setup_logger("llm_handler", os.path.join(folder_name, "llm_handler.log"))
+doc_handler_logger = setup_logger("doc_handler", os.path.join(folder_name, "doc_handler.log"))
 voice_handler_logger = setup_logger("voice_handler", os.path.join(folder_name, "voice_handler.log"))
 fastapi_app_logger = setup_logger("fastapi_app", os.path.join(folder_name, "fastapi_app.log"))
+embedding_vec_logger = setup_logger("embedding_vec", os.path.join(folder_name, "embedding_vec.log"))
