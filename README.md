@@ -24,3 +24,5 @@ An AI powered assistant designed for accounting courses.
 1. **Language Model:** `deepseek-r1-distill-llama-70b` from [Groq](https://console.groq.com/). I chose this because of its reasoning capabilities since that is what I am looking to achieve with the assistant. 
 
 2. **Vector Database - PineCone:** 
+
+3. **Embedding Model - HuggingFace**: `sentence-transformers/all-MiniLM-L6-v2`
