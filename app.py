@@ -16,7 +16,7 @@ async def health_check():
     """
     Health check point to verify if the API is running smoothly
     """
-    return JSONResponse(content={"status": "ok", "message": "Welcome to the AI-Powered Assistant"}, status_code=200)
+    return JSONResponse(content={"status": "ok", "message": "Welcome to the AI-Powered Assistant for Accounting Students"}, status_code=200)
 
 
 @app.post("/query")
