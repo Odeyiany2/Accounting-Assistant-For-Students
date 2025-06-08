@@ -41,6 +41,9 @@ def transcibe_audio(audio_file:str) -> str:
         voice_handler_logger.error(f"Error initializing recognizer: {e}")
         raise e
 
+
+
+
 #text to speech function 
 def text_to_speech(text:str, output_file:str = "output.mp3") -> str:
     """
