@@ -1,6 +1,7 @@
 #voice implementation
 import speech_recognition as sr
 import os 
+import pyttsx3
 from pydub import AudioSegment
 from config.logging import voice_handler_logger
 
@@ -39,3 +40,20 @@ def transcibe_audio(audio_file:str) -> str:
     except Exception as e:
         voice_handler_logger.error(f"Error initializing recognizer: {e}")
         raise e
+
+#text to speech function 
+def text_to_speech(text:str, output_file:str = "output.mp3") -> str:
+    """
+    Converts the response to a speech audio file using pyttsx3
+    """
+    try:
+        #initialize the engine 
+        engine = pyttsx3.init()
+        engine.save_to_file(text, output_file)
+        engine.runAndWait()
+        voice_handler_logger.info(f"Text to speech conversion successful: {output_file}")
+        return output_file
+    except Exception as e:
+        voice_handler_logger.error(f"Error in text to speech conversion: {e}")
+        raise e
+
