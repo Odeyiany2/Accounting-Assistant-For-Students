@@ -2,7 +2,7 @@
 import speech_recognition as sr
 import os 
 from pydub import AudioSegment
-from config.logging import voice_input_logger
+from config.logging import voice_handler_logger
 
 def transcibe_audio(audio_file:str) -> str:
     """
@@ -31,11 +31,11 @@ def transcibe_audio(audio_file:str) -> str:
             try:
                 #transcribe the audio using Google web speech API
                 text = recognizer.recognize_google(audio_data)
-                voice_input_logger.info(f"Transcription successful: {text}")
+                voice_handler_logger.info(f"Transcription successful: {text}")
                 return text
             except sr.UnknownValueError:
-                voice_input_logger.error("Google Web Speech API could not understand the audio.")
+                voice_handler_logger.error("Google Web Speech API could not understand the audio.")
                 return "Could not understand the audio."
     except Exception as e:
-        voice_input_logger.error(f"Error initializing recognizer: {e}")
+        voice_handler_logger.error(f"Error initializing recognizer: {e}")
         raise e
