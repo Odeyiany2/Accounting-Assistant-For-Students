@@ -26,3 +26,5 @@ An AI powered assistant designed for accounting courses.
 2. **Vector Database - PineCone:** 
 
 3. **Embedding Model - HuggingFace**: `sentence-transformers/all-MiniLM-L6-v2`
+
+4. **Voice Implementation**: Google's web speech API `speech_recognition` and python library `pyttsx3`
