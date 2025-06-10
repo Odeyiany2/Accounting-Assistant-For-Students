@@ -6,6 +6,8 @@ from langchain_core.messages import HumanMessage
 from langchain_core.documents import Document
 from embedding_vec import embedding_model
 
+
+
 #RAFT Prompting 
 RAFT_prompt = ChatPromptTemplate.from_template("""
 You are an expert accounting tutor helping students with questions in the following courses: 
