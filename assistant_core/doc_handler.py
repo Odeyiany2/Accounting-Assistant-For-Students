@@ -9,8 +9,6 @@ from pathlib import Path
 from dotenv import load_dotenv
 from groq import Groq #language model wrapper for Groq API
 from langchain_community.document_loaders import TextLoader, PyMuPDFLoader, Docx2txtLoader#langchain wrapper for loading documents from a directory
-from langchain.chains.combine_documents import create_stuff_documents_chain 
-from langchain.chains.retrieval import create_retrieval_chain
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.docstore.document import Document
 from pdf2image import convert_from_path
