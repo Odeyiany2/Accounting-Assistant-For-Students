@@ -5,6 +5,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from config.logging import fastapi_app_logger
 import os
 
 app = FastAPI()
