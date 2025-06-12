@@ -22,6 +22,12 @@ if not groq_api_key:
     retriever_prompt_logger.error("GROQ_API_KEY environment variable not set.")
     raise ValueError("GROQ_API_KEY environment variable not set.")
 
+#set up the Tavily API key 
+tavily_api_key = os.getenv("TAVILY_API_KEY")
+if not tavily_api_key:
+    retriever_prompt_logger.error("TAVILY_API_KEY environment variable not set.")
+    raise ValueError("TAVILY_API_KEY environment variable not set.")
+
 # Set up the Groq API client
 model = Groq(
     api_key = groq_api_key,
