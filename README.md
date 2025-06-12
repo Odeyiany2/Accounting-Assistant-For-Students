@@ -29,4 +29,4 @@ An AI powered assistant designed for accounting courses.
 
 4. **Voice Implementation**: Google's web speech API `speech_recognition` and python library `pyttsx3`
 
-5. **Prompting Stlye**: RAFT style
+5. **Prompting Style**: RAFT style
