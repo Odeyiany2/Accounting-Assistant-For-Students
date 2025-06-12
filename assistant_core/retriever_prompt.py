@@ -1,12 +1,12 @@
 #implementation for retrieving, conversation awareness and also for prompt engineering
 import os
+from tavily import TavilyClient
 from langchain.chains.combine_documents import create_stuff_documents_chain 
 from langchain.chains.retrieval import create_retrieval_chain
 from langchain.chains.history_aware_retriever import create_history_aware_retriever
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage
 from langchain_core.documents import Document
-from embedding_vec import embedding_model
 from dotenv import load_dotenv
 from groq import Groq #language model wrapper for Groq API
 from config.logging import retriever_prompt_logger
@@ -32,7 +32,7 @@ model = Groq(
 
 #retrieval chain setup
 retrieval = create_history_aware_retriever(
-    retriever=doc_store.as_retriever(),
+    retriever=doc_store.as_retriever(),  # Retrieve top 5 relevant documents based on the course and query
     history_length=5,  # Number of previous interactions to consider
     llm=model,  # Use the Groq model for retrieval
     prompt=ChatPromptTemplate.from_template(
