@@ -93,31 +93,101 @@ def search_web(query:str, num_results: int = 3):
 
 
 
+#main function to handle the retrieval and response generation
+def ask_assistant(question:str, course:str = None, chat_history:list = []):
+    try:
+        #setup retriever with course filter
+        if course:
+            retriever = doc_store.as_retriever(
+                search_kwargs={"filter": {"subject": course}},
+                search_type="similarity",
+                k=5  #retrieve top 5 relevant documents
+            )
+        else:
+            retriever = doc_store.as_retriever(k=5)  #retrieve top 5 relevant documents without course filter
+        retriever_prompt_logger.info(f"Retrieving documents for question: {question} with course: {course}")
 
+        #wrap the retriever with history awareness
+        try:
+            history_aware_retriever = create_history_aware_retriever(
+                retriever=retriever,
+                history_length=5,  #number of previous interactions to consider
+                llm=model,  #use the Groq model for retrieval
+                prompt=ChatPromptTemplate.from_template(
+                    "You are an expert accounting tutor. "
+                    "Answer the question based on the provided context: {context} "
+                    "Question: {input}"
+                )
+            )
+            retriever_prompt_logger.info("History-aware retriever created successfully.")
+        except Exception as e:
+            retriever_prompt_logger.error(f"Error creating history-aware retriever: {e}")
+            return "Sorry, an error occurred while setting up the retriever."
 
-#retrieval chain setup
-retrieval = create_history_aware_retriever(
-    retriever=doc_store.as_retriever(),  # Retrieve top 5 relevant documents based on the course and query
-    history_length=5,  # Number of previous interactions to consider
-    llm=model,  # Use the Groq model for retrieval
-    prompt=ChatPromptTemplate.from_template(
-        "You are an expert accounting tutor. "
-        "Answer the question based on the provided context: {context} "
-        "Question: {input}"
-    )
-)
+        #retrieve relevant documents
+        retrieved_docs = history_aware_retriever.invoke(
+            {"input": question, "history": chat_history}
+        )
+        retriever_prompt_logger.info(f"Retrieved {len(retrieved_docs)} documents for question: {question}")
+        if not retrieved_docs:
+            retriever_prompt_logger.warning("No relevant documents found. Searching the web for answers.")
+            try:
+                web_content, web_urls = search_web(question)
+                web_prompt = ChatPromptTemplate.from_template("""
+    You are an expert accounting tutor. A student has asked a question that is not covered by the course materials.
+    Please search the web to find an accurate answer and provide the source link.
+    Question: {input}
+    **Web Results**:
+    {context}
 
-#create a document chain for retrieval
-document_chain = create_stuff_documents_chain(
-    llm=model,
-    prompt=RAFT_prompt,
-    document_variable_name="context",
-    return_source_documents=True
-)
+    ## Answer:
+    """)
+                answer = model.invoke(
+                    web_prompt.format(input=question, context=web_content)
+                ).content
+                retriever_prompt_logger.info(f"Web search answer: {answer}")
+                return answer + f"\nSources: {', '.join(web_urls)}"
+            except Exception as e:
+                retriever_prompt_logger.error(f"Error during web search: {e}")
+                return "Sorry, I couldn't find any relevant information online. Please try again later."
+            
+        #create document chain for retrieval
+        try:
+            retriever_prompt_logger.info("Creating document chain for retrieval.")
+            document_chain = create_stuff_documents_chain(
+                llm=model,
+                prompt=RAFT_prompt,
+                document_variable_name="context",
+                return_source_documents=True
+            )
+            retriever_prompt_logger.info("Document chain created successfully.")
+        except Exception as e:
+            retriever_prompt_logger.error(f"Error creating document chain: {e}")
+            return "Sorry, an error occurred while setting up the document chain."
 
-#create the retrieval chain
-retrieval_chain = create_retrieval_chain(
-    retriever=retrieval,
-    document_chain=document_chain,
-    return_source_documents=True
-)
+        #create the FINAL retrieval chain
+        try:
+            retriever_prompt_logger.info("Creating retrieval chain.")
+            retrieval_chain = create_retrieval_chain(
+                retriever=history_aware_retriever,
+                document_chain=document_chain,
+                return_source_documents=True
+            )
+
+            retriever_prompt_logger.info("Retrieval chain created successfully.")
+        except Exception as e:
+            retriever_prompt_logger.error(f"Error creating retrieval chain: {e}")
+            return "Sorry, an error occurred while setting up the retrieval chain." 
+        
+        #invoke the retrieval chain with the question and chat history
+        try:
+            response = retrieval_chain.invoke(
+                {"input": question, "history": chat_history}
+            )
+            return response["answer"]
+        except Exception as e:
+            retriever_prompt_logger.error(f"Error invoking final retrieval chain for a response: {e}")
+            return "Sorry, an error occurred while generating a response."
+    except Exception as e:
+        retriever_prompt_logger.error(f"Error in ask_assistant: {e}")
+        return "Sorry, an error occurred while processing your request."
