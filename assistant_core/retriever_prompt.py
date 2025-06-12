@@ -28,6 +28,9 @@ if not tavily_api_key:
     retriever_prompt_logger.error("TAVILY_API_KEY environment variable not set.")
     raise ValueError("TAVILY_API_KEY environment variable not set.")
 
+# Initialize the Tavily client for web search
+tavily_client = TavilyClient(tavily_api_key)
+
 # Set up the Groq API client
 model = Groq(
     api_key = groq_api_key,
@@ -35,18 +38,6 @@ model = Groq(
     temperature = 0.5
 )
 
-
-#retrieval chain setup
-retrieval = create_history_aware_retriever(
-    retriever=doc_store.as_retriever(),  # Retrieve top 5 relevant documents based on the course and query
-    history_length=5,  # Number of previous interactions to consider
-    llm=model,  # Use the Groq model for retrieval
-    prompt=ChatPromptTemplate.from_template(
-        "You are an expert accounting tutor. "
-        "Answer the question based on the provided context: {context} "
-        "Question: {input}"
-    )
-)
 
 #RAFT Prompting 
 RAFT_prompt = ChatPromptTemplate.from_template("""
@@ -86,6 +77,35 @@ that you can only assist with questions related to those courses.
 ## Answer:
 <final answer goes here>
 """)
+
+#Web search fallback function 
+def search_web(query:str, num_results: int = 3):
+    try:
+        results = tavily_client.search(query, max_results=num_results)
+        sources = [results["content"] for result in results["results"]]
+        urls = [result["url"] for result in results["results"]]
+        retriever_prompt_logger.info(f"Web search results for query '{query}': {urls}")
+        combined_content = "\n\n".join(sources)
+        return combined_content, urls
+    except Exception as e:
+        retriever_prompt_logger.error(f"Error occurred during web search: {e}")
+        return "I encountered an error while searching the web. Please try again later.", []
+
+
+
+
+
+#retrieval chain setup
+retrieval = create_history_aware_retriever(
+    retriever=doc_store.as_retriever(),  # Retrieve top 5 relevant documents based on the course and query
+    history_length=5,  # Number of previous interactions to consider
+    llm=model,  # Use the Groq model for retrieval
+    prompt=ChatPromptTemplate.from_template(
+        "You are an expert accounting tutor. "
+        "Answer the question based on the provided context: {context} "
+        "Question: {input}"
+    )
+)
 
 #create a document chain for retrieval
 document_chain = create_stuff_documents_chain(
