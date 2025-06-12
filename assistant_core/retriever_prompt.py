@@ -1,13 +1,32 @@
 #implementation for retrieving, conversation awareness and also for prompt engineering
 from langchain.chains.combine_documents import create_stuff_documents_chain 
 from langchain.chains.retrieval import create_retrieval_chain
+from langchain.chains.history_aware_retriever import create_history_aware_retriever
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage
 from langchain_core.documents import Document
 from embedding_vec import embedding_model
+import os
+from dotenv import load_dotenv
+from groq import Groq #language model wrapper for Groq API
+from config.logging import retriever_prompt_logger
 
+load_dotenv() #load environment variables from .env file
 
+# Set up the Groq API key
+groq_api_key = os.getenv("GROQ_API_KEY")
+if not groq_api_key:
+    retriever_prompt_logger.error("GROQ_API_KEY environment variable not set.")
+    raise ValueError("GROQ_API_KEY environment variable not set.")
 
+# Set up the Groq API client
+model = Groq(
+    api_key = groq_api_key,
+    model = "deepseek-r1-distill-llama-70b",
+    temperature = 0.5
+)
+
+#document chain 
 #RAFT Prompting 
 RAFT_prompt = ChatPromptTemplate.from_template("""
 You are an expert accounting tutor helping students with questions in the following courses: 

@@ -6,28 +6,12 @@ import os
 import pytesseract
 from typing import List
 from pathlib import Path
-from dotenv import load_dotenv
-from groq import Groq #language model wrapper for Groq API
 from langchain_community.document_loaders import TextLoader, PyMuPDFLoader, Docx2txtLoader#langchain wrapper for loading documents from a directory
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.docstore.document import Document
 from pdf2image import convert_from_path
 from config.logging import doc_handler_logger
 
-load_dotenv() #load environment variables from .env file
-
-# Set up the Groq API key
-groq_api_key = os.getenv("GROQ_API_KEY")
-if not groq_api_key:
-    doc_handler_logger.error("GROQ_API_KEY environment variable not set.")
-    raise ValueError("GROQ_API_KEY environment variable not set.")
-
-# Set up the Groq API client
-model = Groq(
-    api_key = groq_api_key,
-    model = "deepseek-r1-distill-llama-70b",
-    temperature = 0.5
-)
 
 
 #check if a pdf contains scanned images 

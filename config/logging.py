@@ -52,7 +52,9 @@ log_files_to_create = [
     "doc_handler.log",
     "voice_handler.log",
     "embedding_vec.log",
-    "fastapi_app.log"]
+    "fastapi_app.log",
+    "main_app.log",
+    "retriever_prompt.log"]
 
 for log_file in log_files_to_create:
     create_folder_and_log_file(folder_name, log_file)
@@ -63,3 +65,6 @@ doc_handler_logger = setup_logger("doc_handler", os.path.join(folder_name, "doc_
 voice_handler_logger = setup_logger("voice_handler", os.path.join(folder_name, "voice_handler.log"))
 fastapi_app_logger = setup_logger("fastapi_app", os.path.join(folder_name, "fastapi_app.log"))
 embedding_vec_logger = setup_logger("embedding_vec", os.path.join(folder_name, "embedding_vec.log"))
+# Set up the logger for the main application
+main_app_logger = setup_logger("main_app", os.path.join(folder_name, "main_app.log"))
+retriever_prompt_logger = setup_logger("retriever_prompt", os.path.join(folder_name, "retriever_prompt.log"))
