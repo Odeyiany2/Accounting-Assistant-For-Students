@@ -4,11 +4,25 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from pydantic import BaseModel
 from config.logging import fastapi_app_logger
 from assistant_core.retriever_prompt import ask_assistant
 import os
 
-app = FastAPI()
+#creating the fastapi instance
+app = FastAPI(title="AI-Powered Assistant for Accounting Students",
+             description="An AI-powered assistant to help accounting students with their queries.",
+             version="1.0.0")
+
+#allowing CORS for all origins
+app.add_middleware(
+    CORSMiddleware, 
+    allow_origins = ["*"],
+    allow_credentials = True, 
+    allow_methods = ["*"], 
+    allow_headers = ["*"]
+)
+
 
 
 #getting the health status of the API 
@@ -17,7 +31,9 @@ async def health_check():
     """
     Health check point to verify if the API is running smoothly
     """
-    return JSONResponse(content={"status": "ok", "message": "Welcome to the AI-Powered Assistant for Accounting Students"}, status_code=200)
+    return JSONResponse(
+        content={"status": "ok", "message": "Welcome to the AI Assistant API 🚀"}, 
+        status_code=200)
 
 
 @app.post("/query")
