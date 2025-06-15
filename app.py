@@ -1,11 +1,11 @@
 #fastapi implementation
-
 import uvicorn 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from config.logging import fastapi_app_logger
+from assistant_core.retriever_prompt import ask_assistant
 import os
 
 app = FastAPI()
