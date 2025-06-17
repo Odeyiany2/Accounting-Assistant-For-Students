@@ -37,5 +37,12 @@ async def health_check():
 
 
 @app.post("/query")
-async def query_chatbot():
+async def query_chatbot(request:Request):
     pass
+
+
+
+if __name__ == "__main__":
+    load_dotenv()
+    print("Starting AI-Powered Assistant for Accounting Students API")
+    uvicorn.run("app:app", host = "0.0.0", port = 5000, reload = True)
