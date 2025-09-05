@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from langchain.text_splitter import RecursiveCharacterTextSplitter #langchain wrapper for splitting text into smaller chunks
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain.vectorstores import Chroma, Pinecone
-from assistant_core.doc_handler import load_documents_from_directory
+from assistant_core.doc_handler import load_documents_from_directory, load_documents_from_upload
 from config.logging import embedding_vec_logger
 
 
@@ -101,3 +101,32 @@ doc_store  = Pinecone.from_documents(chunked_docs,
                                      namespace = "financial_accounting")
 
 
+
+#temporary storage for user uploaded documents
+def build_temp_doc_store(uploaded_docs: List[Document]) -> Pinecone:
+    """
+    Build a temporary Pinecone vector store for user-uploaded documents.
+    
+    Args:
+        uploaded_docs (List[Document]): List of user-uploaded documents.
+    
+    Returns:
+        Pinecone: Pinecone vector store containing embeddings of the uploaded documents.
+    """
+    try:
+        if not uploaded_docs:
+            embedding_vec_logger.warning("No uploaded documents provided to build temporary doc store.")
+            return None
+        users_doc = load_documents_from_upload(uploaded_docs)
+        chunked_uploaded_docs = chunk_docs(users_doc)
+        temp_doc_store = Pinecone.from_documents(
+            chunked_uploaded_docs,
+            embedding_model,
+            index_name=index_name,
+            namespace="user_uploads"
+        )
+        embedding_vec_logger.info(f"Built temporary document store with {len(chunked_uploaded_docs)} chunks from uploaded documents.")
+        return temp_doc_store
+    except Exception as e:
+        embedding_vec_logger.error(f"Error building temporary document store: {e}")
+        raise e

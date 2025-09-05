@@ -35,6 +35,10 @@ async def health_check():
         content={"status": "ok", "message": "Welcome to the AI Assistant API 🚀"}, 
         status_code=200)
 
+@app.post("/upload")
+async def upload_documents(request:Request):
+    pass
+
 
 @app.post("/query")
 async def query_chatbot(request:Request):

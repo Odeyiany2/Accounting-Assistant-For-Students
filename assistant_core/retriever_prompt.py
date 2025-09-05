@@ -4,13 +4,14 @@ from tavily import TavilyClient
 from langchain.chains.combine_documents import create_stuff_documents_chain 
 from langchain.chains.retrieval import create_retrieval_chain
 from langchain.chains.history_aware_retriever import create_history_aware_retriever
+from langchain.retrievers import EnsembleRetriever
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage
 from langchain_core.documents import Document
 from dotenv import load_dotenv
 from groq import Groq #language model wrapper for Groq API
 from config.logging import retriever_prompt_logger
-from embedding_vec import doc_store
+from embedding_vec import doc_store, build_temp_doc_store
 
 
 
@@ -85,23 +86,35 @@ def search_web(query:str, num_results: int = 3):
 
 
 #main function to handle the retrieval and response generation
-def ask_assistant(question:str, course:str = None, chat_history:list = []):
+def ask_assistant(question:str, course:str = None, chat_history:list = [], uploaded_docs: list = []):
     try:
         #setup retriever with course filter
         if course:
-            retriever = doc_store.as_retriever(
+            base_retriever = doc_store.as_retriever(
                 search_kwargs={"filter": {"subject": course}},
                 search_type="similarity",
                 k=5  #retrieve top 5 relevant documents
             )
         else:
-            retriever = doc_store.as_retriever(k=5)  #retrieve top 5 relevant documents without course filter
+            base_retriever = doc_store.as_retriever(k=5)  #retrieve top 5 relevant documents without course filter
         retriever_prompt_logger.info(f"Retrieving documents for question: {question} with course: {course}")
+        
+        #list of retrievers to combine
+        retrievers = [base_retriever]
 
+        #add temporary user-uploaded document retriever if available
+        temp_doc_store = build_temp_doc_store(uploaded_docs) 
+        if temp_doc_store:
+            retrievers.append(temp_doc_store.as_retriever(k = 5))
+
+        #combine retrievers using EnsembleRetriever
+        combine_retriever = EnsembleRetriever(retrievers=retrievers, weights=[1]*len(retrievers))
+        
+        
         #wrap the retriever with history awareness
         try:
             history_aware_retriever = create_history_aware_retriever(
-                retriever=retriever,
+                retriever=combine_retriever,
                 history_length=5,  #number of previous interactions to consider
                 llm=model,  #use the Groq model for retrieval
                 prompt=ChatPromptTemplate.from_template(
@@ -120,6 +133,7 @@ def ask_assistant(question:str, course:str = None, chat_history:list = []):
             {"input": question, "history": chat_history}
         )
         retriever_prompt_logger.info(f"Retrieved {len(retrieved_docs)} documents for question: {question}")
+
         if not retrieved_docs:
             retriever_prompt_logger.warning("No relevant documents found. Searching the web for answers.")
             try:

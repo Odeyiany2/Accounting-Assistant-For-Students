@@ -4,12 +4,15 @@
 #libraries 
 import os
 import pytesseract
+import tempfile
 from typing import List
 from pathlib import Path
 from langchain_community.document_loaders import TextLoader, PyMuPDFLoader, Docx2txtLoader#langchain wrapper for loading documents from a directory
+from langchain_community.document_loaders.image import UnstructuredImageLoader
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.docstore.document import Document
 from pdf2image import convert_from_path
+from PIL import Image
 from config.logging import doc_handler_logger
 
 
@@ -145,3 +148,70 @@ def load_documents_from_directory(directory_path:str) -> List[Document]:
                 continue
     return all_documents
 
+#load documents uploaded by users: Students
+def load_documents_from_upload(uploaded_files) -> List[Document]:
+    """
+    Load and parse uploaded documents (PDF, DOCX, TXT, Images).
+    
+    Args:
+        uploaded_files: List of file-like objects (e.g. from FastAPI UploadFile or Streamlit st.file_uploader).
+    
+    Returns:
+        List[Document]: Parsed documents ready for embedding.
+    """
+
+    all_docs_user = []
+    for file in uploaded_files:
+        #save file temporarily
+        suffix = os.path.splitext(file.filename)[-1].lower()
+        with tempfile.NamedTemporaryFile(delete= False, suffix=suffix) as temp_file:
+            temp_file.write(file.file.read() if hasattr(file, "file") else file.read())
+            temp_file_path = temp_file.name
+
+        docs = []
+        try:
+            if suffix == ".pdf":
+                if is_scanned_pdf(temp_file_path):
+                    print(f"[OCR] Processing scanned PDF: {file.filename}")
+                    doc_handler_logger.info(f"[OCR] Processing scanned PDF: {file.filename}")
+                    # Extract text from scanned PDF using OCR
+                    text = extract_text_from_scanned_pdf(temp_file_path)
+                    if text:
+                        all_docs_user.append(Document(page_content = text,
+                                                       metadata = {"source":file.filename, "subject":"user_upload"}))
+
+                else:
+                    print(f"[PDF] Processing PDF: {file.filename}")
+                    doc_handler_logger.info(f"[PDF] Processing PDF: {file.filename}")
+                    loader = PyMuPDFLoader(file_path=temp_file_path)
+                    docs = loader.load()
+            elif suffix == ".docx":
+                print(f"[DOCX] Processing DOCX: {file.filename}")
+                doc_handler_logger.info(f"[DOCX] Processing DOCX: {file.filename}")
+                loader = Docx2txtLoader(file_path=temp_file_path)
+                docs = loader.load()
+            elif suffix == ".txt":
+                print(f"[TXT] Processing TXT: {file.filename}")
+                doc_handler_logger.info(f"[TXT] Processing TXT: {file.filename}")
+                loader = TextLoader(file_path=temp_file_path, encoding="utf-8")
+                docs = loader.load()
+            elif suffix in [".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".gif"]:
+                print(f"[Image] Processing Image: {file.filename}")
+                doc_handler_logger.info(f"[Image] Processing Image: {file.filename}")
+                loader = UnstructuredImageLoader(file_path=temp_file_path)
+                docs = loader.load()
+            else:
+                doc_handler_logger.warning(f"Unsupported file type: {suffix}. Skipping file: {file.filename}")
+                continue
+
+            for d in docs:
+                d.metadata["subject"] = "user_upload"
+                d.metadata["source"] = file.filename
+                all_docs_user.append(d)
+        finally:
+            # Clean up the temporary file
+            os.remove(temp_file_path)
+    return all_docs_user
+
+
+    
