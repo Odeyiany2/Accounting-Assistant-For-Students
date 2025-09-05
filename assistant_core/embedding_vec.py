@@ -105,8 +105,9 @@ doc_store  = Pinecone.from_documents(chunked_docs,
 #temporary storage for user uploaded documents
 def build_temp_doc_store(uploaded_docs: List[Document]) -> Pinecone:
     """
-    Build a temporary Pinecone vector store for user-uploaded documents.
-    
+    Build a temporary in-memory Chroma vector store for user-uploaded documents.
+    This avoids polluting the main Pinecone index with temporary data.
+
     Args:
         uploaded_docs (List[Document]): List of user-uploaded documents.
     
@@ -117,13 +118,14 @@ def build_temp_doc_store(uploaded_docs: List[Document]) -> Pinecone:
         if not uploaded_docs:
             embedding_vec_logger.warning("No uploaded documents provided to build temporary doc store.")
             return None
-        users_doc = load_documents_from_upload(uploaded_docs)
-        chunked_uploaded_docs = chunk_docs(users_doc)
-        temp_doc_store = Pinecone.from_documents(
-            chunked_uploaded_docs,
-            embedding_model,
-            index_name=index_name,
-            namespace="user_uploads"
+        
+        chunked_uploaded_docs = chunk_docs(uploaded_docs)
+        # Build temporary in-memory Chroma store
+        temp_doc_store = Chroma.from_documents(
+            documents=chunked_uploaded_docs,
+            embedding=embedding_model,
+            collection_name="user_uploads",
+            persist_directory=None  # In-memory, won't persist after session ends
         )
         embedding_vec_logger.info(f"Built temporary document store with {len(chunked_uploaded_docs)} chunks from uploaded documents.")
         return temp_doc_store

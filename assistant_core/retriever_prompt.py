@@ -110,6 +110,7 @@ def ask_assistant(question:str, course:str = None, chat_history:list = [], uploa
         #combine retrievers using EnsembleRetriever
         combine_retriever = EnsembleRetriever(retrievers=retrievers, weights=[1]*len(retrievers))
         
+        retriever_prompt_logger.info("Combined retrievers successfully.")
         
         #wrap the retriever with history awareness
         try:

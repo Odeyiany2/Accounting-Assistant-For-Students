@@ -1,12 +1,15 @@
 #fastapi implementation
 import uvicorn 
-from fastapi import FastAPI, HTTPException, Request
+import uuid
+from fastapi import FastAPI, HTTPException, Request, File, UploadFile
+from typing import List
 from fastapi.responses import JSONResponse, PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from pydantic import BaseModel
 from config.logging import fastapi_app_logger
 from assistant_core.retriever_prompt import ask_assistant
+from assistant_core.doc_handler import load_documents_from_upload
 import os
 
 #creating the fastapi instance
@@ -23,7 +26,7 @@ app.add_middleware(
     allow_headers = ["*"]
 )
 
-
+user_uploaded_docs = {}
 
 #getting the health status of the API 
 @app.get("/health")
@@ -36,8 +39,34 @@ async def health_check():
         status_code=200)
 
 @app.post("/upload")
-async def upload_documents(request:Request):
-    pass
+async def upload_documents(files: List[UploadFile] = File(...)):
+    """
+    Endpoint to handle document uploads from users.
+    """
+    # Placeholder implementation
+    try:
+        #parse uploaded files from the request 
+        docs = load_documents_from_upload(files)
+
+        if not docs:
+            fastapi_app_logger.error("No valid documents were uploaded.")
+            raise HTTPException(status_code=400, detail="No valid documents were uploaded.")
+        session_id = str(uuid.uuid4())
+        user_uploaded_docs[session_id] = docs
+        fastapi_app_logger.info(f"Successfully processed {len(docs)} documents from upload.")
+
+        return JSONResponse(
+            content = {
+                "status": "success", 
+                "message": f"Successfully uploaded and processed {len(docs)} documents.",
+                "session_id": session_id
+            },
+            status_code=200
+        )
+    except Exception as e:
+        fastapi_app_logger.error(f"Error processing uploaded documents: {e}")
+        raise HTTPException(status_code=500, detail="Error processing uploaded documents.")
+
 
 
 @app.post("/query")
@@ -48,13 +77,24 @@ async def query_chatbot(request:Request):
     try:
         data = await request.json()
         query = data.get("query")
+        session_id = data.get("session_id")
+        course = data.get("course")  #optional course filter
+        chat_history = data.get("history", [])  #optional chat history
 
         if not query:
             fastapi_app_logger.error("Query parameter is missing")
             raise HTTPException(status_code=400, detail="Query parameter is required")
         
+        #retrieving user-uploaded documents for the session if available
+        uploaded_docs = user_uploaded_docs.get(session_id, []) if session_id else []
+
         #calling the assistant function to get the response 
-        response = ask_assistant(query)
+        response = ask_assistant(
+            question=query, 
+            course=course, 
+            chat_history=chat_history,
+            uploaded_docs=uploaded_docs
+        )
         fastapi_app_logger.info(f"Received response from the assistant: {response}")
         
         if not response:
@@ -67,6 +107,9 @@ async def query_chatbot(request:Request):
     except HTTPException as http_exc:
         fastapi_app_logger.error(f"HTTP Exception: {http_exc.detail}")
         raise http_exc
+    except Exception as e:
+        fastapi_app_logger.error(f"Error processing query: {e}")
+        raise HTTPException(status_code=500, detail="Error processing query")
 
 
 
