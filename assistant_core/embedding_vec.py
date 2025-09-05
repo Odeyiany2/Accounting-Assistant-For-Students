@@ -82,9 +82,9 @@ embedding_model = HuggingFaceBgeEmbeddings(
 #getting the data extracted from the document handler module 
 course_dir = {
     "financial_accounting": "C:\Projects_ML\Accounting-Assistant-For-Students\data\financial_accounting",
-    "finance": "C:\Projects_ML\Accounting-Assistant-For-Students\data\finance",
-    "business": "C:\Projects_ML\Accounting-Assistant-For-Students\data\business",
-    "managerial_accounting": "C:\Projects_ML\Accounting-Assistant-For-Students\data\managerial_accounting"
+    # "finance": "C:\Projects_ML\Accounting-Assistant-For-Students\data\finance",
+    # "business": "C:\Projects_ML\Accounting-Assistant-For-Students\data\business",
+    # "managerial_accounting": "C:\Projects_ML\Accounting-Assistant-For-Students\data\managerial_accounting"
 }
 all_docs = []
 for course, path in course_dir.items():

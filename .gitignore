@@ -9,3 +9,6 @@ vector_store/
 *chroma.log
 *.log
 *.sqlite
+*data/Business/
+*data/Finance/
+*data/Managerial_Accounting/

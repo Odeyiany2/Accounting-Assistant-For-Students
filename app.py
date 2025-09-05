@@ -11,7 +11,7 @@ import os
 
 #creating the fastapi instance
 app = FastAPI(title="AI-Powered Assistant for Accounting Students",
-             description="An AI-powered assistant to help accounting students with their queries.",
+             description="An AI-powered assistant to assist accounting students with Financial Accounting",
              version="1.0.0")
 
 #allowing CORS for all origins

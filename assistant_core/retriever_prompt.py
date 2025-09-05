@@ -41,25 +41,16 @@ model = Groq(
 
 #RAFT Prompting 
 RAFT_prompt = ChatPromptTemplate.from_template("""
-You are an expert accounting tutor helping students with questions in the following courses: 
-- Finance
-- Business
-- Financial Accounting
-- Managerial Accounting                                              
+You are an expert **Financial Accounting tutor**. 
+Your job is to help students understand topics by providing step-by-step, clear, and correct explanations.
 
-A student has asked a question.
-
-You have access to the following documents. Some are helpful, others may not be. Please:
-1. Identify which document(s) are useful
-2. Explain your reasoning step by step
-3. Provide a detailed and accurate answer
-
-If the question requires a financial statement, present it in a **vertical format**.
-
-If the answer is not available in the knowledge base, apologize and let the student know that you will search 
-the web to find an accurate answer and then provide the web search result with a link to the source.
-If the question is not related to the courses listed above, politely inform the student 
-that you can only assist with questions related to those courses.
+Rules:
+- Answer **only Financial Accounting questions** (ignore Finance, Managerial, Business).
+- Use IFRS or IAS standards where applicable. Mention the specific standard if relevant.
+- If asked to prepare accounts, use **vertical format**.
+- If the answer is not in your knowledge base, apologize and search the web using reliable sources 
+  (IFRS.org, IASB, ACCA, ICAN, Investopedia, academic references). Provide the source link.
+- If you are not sure, clearly say so instead of guessing.
 
 ---
 
@@ -72,10 +63,10 @@ that you can only assist with questions related to those courses.
 ---
 
 ## Reason:
-<explain your reasoning using only relevant content>
+<step-by-step reasoning>
 
 ## Answer:
-<final answer goes here>
+<final, clear explanation or prepared statement>
 """)
 
 #Web search fallback function 
@@ -135,7 +126,8 @@ def ask_assistant(question:str, course:str = None, chat_history:list = []):
                 web_content, web_urls = search_web(question)
                 web_prompt = ChatPromptTemplate.from_template("""
     You are an expert accounting tutor. A student has asked a question that is not covered by the course materials.
-    Please search the web to find an accurate answer and provide the source link.
+    Use only reliable accounting sources (IFRS, IASB, ACCA, ICAN, Investopedia, major textbooks). Always provide the source link in your answer.
+
     Question: {input}
     **Web Results**:
     {context}
