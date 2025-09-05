@@ -39,7 +39,7 @@ else:
 
 
 #function for chunking 
-def chunk_docs(docs: List[Document], chunk_size: int = 1000, chunk_overlap: int = 200) -> List[Document]:
+def chunk_docs(docs: List[Document], chunk_size: int = 800, chunk_overlap: int = 150) -> List[Document]:
     """
     This function is used to chunk documents into smaller pieces for embedding. 
     It uses langchain's RecursiveCharacterTextSplitter to split the loaded documents into smaller chunks
@@ -82,9 +82,6 @@ embedding_model = HuggingFaceBgeEmbeddings(
 #getting the data extracted from the document handler module 
 course_dir = {
     "financial_accounting": "C:\Projects_ML\Accounting-Assistant-For-Students\data\financial_accounting",
-    # "finance": "C:\Projects_ML\Accounting-Assistant-For-Students\data\finance",
-    # "business": "C:\Projects_ML\Accounting-Assistant-For-Students\data\business",
-    # "managerial_accounting": "C:\Projects_ML\Accounting-Assistant-For-Students\data\managerial_accounting"
 }
 all_docs = []
 for course, path in course_dir.items():
@@ -101,6 +98,6 @@ chunked_docs = chunk_docs(all_docs)
 doc_store  = Pinecone.from_documents(chunked_docs, 
                                      embedding_model, 
                                      index_name = index_name,
-                                     namespace = "accounting-assistant")
+                                     namespace = "financial_accounting")
 
 
