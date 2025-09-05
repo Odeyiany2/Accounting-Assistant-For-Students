@@ -73,7 +73,7 @@ Rules:
 def search_web(query:str, num_results: int = 3):
     try:
         results = tavily_client.search(query, max_results=num_results)
-        sources = [results["content"] for result in results["results"]]
+        sources = [result["content"] for result in results["results"]]
         urls = [result["url"] for result in results["results"]]
         retriever_prompt_logger.info(f"Web search results for query '{query}': {urls}")
         combined_content = "\n\n".join(sources)
