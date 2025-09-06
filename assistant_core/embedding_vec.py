@@ -9,7 +9,8 @@ from dotenv import load_dotenv
 from langchain.text_splitter import RecursiveCharacterTextSplitter #langchain wrapper for splitting text into smaller chunks
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain_community.vectorstores import Chroma
-from assistant_core.doc_handler import load_documents_from_directory, load_documents_from_upload
+from langchain_pinecone import PineconeVectorStore
+from assistant_core.doc_handler import load_documents_from_directory
 from config.logging import embedding_vec_logger
 
 
@@ -79,28 +80,34 @@ embedding_model = HuggingFaceBgeEmbeddings(
     model_name = "sentence-transformers/all-MiniLM-L6-v2",
     model_kwargs = {
         "device": "cuda" if torch.cuda.is_available() else "cpu",
-        "max_length": 512,
-        "batch_size": 32
-    }
+    }, 
+    encode_kwargs = {"normalize_embeddings": True}
 )
 
 #getting the data extracted from the document handler module 
 course_dir = {
-    "financial_accounting": "C:\Projects_ML\Accounting-Assistant-For-Students\data\financial_accounting",
+    "financial_accounting": r"C:\Projects_ML\Accounting-Assistant-For-Students\data\financial_accounting",
 }
 all_docs = []
 for course, path in course_dir.items():
     docs = load_documents_from_directory(path)
     for doc in docs:
+        if isinstance(doc, tuple):
+            text, file_path = doc
+            doc = Document(page_content=text, metadata={"source": file_path})
+        
+        # safely add course metadata
         doc.metadata["course"] = course
-    all_docs.extend(docs)
+        
+        # append the fixed document
+        all_docs.append(doc)
 
 #chunk the documents into smaller pieces
 chunked_docs = chunk_docs(all_docs)
 
 
 #push to pinecone index
-doc_store  = Pinecone.from_documents(chunked_docs, 
+doc_store  = PineconeVectorStore.from_documents(chunked_docs, 
                                      embedding_model, 
                                      index_name = index_name,
                                      namespace = "financial_accounting")

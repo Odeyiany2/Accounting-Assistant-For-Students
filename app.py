@@ -118,3 +118,5 @@ if __name__ == "__main__":
     load_dotenv()
     print("Starting AI-Powered Assistant for Accounting Students API")
     uvicorn.run("app:app", host = "0.0.0", port = 5000, reload = True)
+
+#how to run the app: uvicorn app:app --host 127.0.0.1 --port 5000 --reload
