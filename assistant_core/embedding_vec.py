@@ -1,14 +1,14 @@
 #libraries to set up embedding model and vector store
 import os 
 import pinecone
-from pinecone import Pinecone
+from pinecone import Pinecone, ServerlessSpec
 import torch #library for GPU support
 from typing import List 
 from langchain.docstore.document import Document #langchain wrapper for document object
 from dotenv import load_dotenv
 from langchain.text_splitter import RecursiveCharacterTextSplitter #langchain wrapper for splitting text into smaller chunks
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
-from langchain.vectorstores import Chroma, Pinecone
+from langchain_community.vectorstores import Chroma
 from assistant_core.doc_handler import load_documents_from_directory, load_documents_from_upload
 from config.logging import embedding_vec_logger
 
@@ -24,16 +24,21 @@ if not pinecone_api_key:
     raise ValueError("PINECONE_API_KEY environment variable not set.")
 
 #initialize pinecone 
-pinecone.init(api_key = pinecone_api_key)
+pc = Pinecone(api_key = os.getenv("PINECONE_API_KEY"))
 
 #create index name and check for index existence
 index_name = "accounting-assistant"
 
-if index_name not in pinecone.list_indexes().names():
+if index_name not in pc.list_indexes().names():
     embedding_vec_logger.info(f"Creating index {index_name}...")
-    pinecone.create_index(index_name, 
-                          dimension=768, 
-                          metric="cosine")
+    pc.create_index(index_name, 
+                          dimension=1536, 
+                          metric="cosine",
+                          vector_type= "dense",
+                          spec=ServerlessSpec(
+                              cloud= "aws",
+                              region ="us-east-1"
+                          ))
 else:
     embedding_vec_logger.info(f"Index {index_name} already exists.")
 

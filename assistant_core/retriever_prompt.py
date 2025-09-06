@@ -11,7 +11,7 @@ from langchain_core.documents import Document
 from dotenv import load_dotenv
 from groq import Groq #language model wrapper for Groq API
 from config.logging import retriever_prompt_logger
-from embedding_vec import doc_store, build_temp_doc_store
+from assistant_core.embedding_vec import doc_store, build_temp_doc_store
 
 
 
