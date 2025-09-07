@@ -83,8 +83,15 @@ st.markdown("""
 
 
 
-st.markdown('<p class="title">📊 Accounting Assistant</p>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">Your AI-powered tutor for Financial Accounting & IFRS Standards</p>', unsafe_allow_html=True)
+st.markdown(
+    '<p style="font-size:35px; font-weight:bold; color:#002147; text-align:center;">📊 Accounting Assistant</p>',
+    unsafe_allow_html=True
+)
+
+st.markdown(
+    '<p style="font-size:18px; color:#00796B; text-align:center;">Your AI-powered tutor for Financial Accounting & IFRS Standards</p>',
+    unsafe_allow_html=True
+)
 
 #session state 
 if "chat_history" not in st.session_state:
