@@ -10,6 +10,7 @@ from langchain_core.messages import HumanMessage
 from langchain_core.documents import Document
 from dotenv import load_dotenv
 from groq import Groq #language model wrapper for Groq API
+from langchain_groq import ChatGroq
 from config.logging import retriever_prompt_logger
 from assistant_core.embedding_vec import doc_store, build_temp_doc_store
 
@@ -32,13 +33,8 @@ if not tavily_api_key:
 # Initialize the Tavily client for web search
 tavily_client = TavilyClient(tavily_api_key)
 
-# Set up the Groq API client
-model = Groq(
-    api_key = groq_api_key,
-    model = "deepseek-r1-distill-llama-70b",
-    temperature = 0.5
-)
-
+#set up the Groq model
+model = ChatGroq(api_key=groq_api_key, model="deepseek-r1-distill-llama-70b", temperature=0.3)
 
 #RAFT Prompting 
 RAFT_prompt = ChatPromptTemplate.from_template("""

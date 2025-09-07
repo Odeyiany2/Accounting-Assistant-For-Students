@@ -28,12 +28,12 @@ if not pinecone_api_key:
 pc = Pinecone(api_key = os.getenv("PINECONE_API_KEY"))
 
 #create index name and check for index existence
-index_name = "accounting-assistant"
+index_name = "accounting-assistant-index"
 
 if index_name not in pc.list_indexes().names():
     embedding_vec_logger.info(f"Creating index {index_name}...")
     pc.create_index(index_name, 
-                          dimension=1536, 
+                          dimension=384, 
                           metric="cosine",
                           vector_type= "dense",
                           spec=ServerlessSpec(
@@ -94,10 +94,15 @@ for course, path in course_dir.items():
     for doc in docs:
         if isinstance(doc, tuple):
             text, file_path = doc
-            doc = Document(page_content=text, metadata={"source": file_path})
+            #safe source fall back 
+            safe_source = str(file_path) if file_path else "unknown"
+            doc = Document(page_content=text, metadata={"source": safe_source})
         
+        #make sure metadata exists
+        if "source" not in doc.metadata or doc.metadata["source"] is None:
+            doc.metadata["source"] = "unknown"
         # safely add course metadata
-        doc.metadata["course"] = course
+        doc.metadata["course"] = str(course)
         
         # append the fixed document
         all_docs.append(doc)
