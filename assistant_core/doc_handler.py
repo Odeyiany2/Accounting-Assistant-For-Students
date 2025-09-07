@@ -52,7 +52,8 @@ def extract_text_from_scanned_pdf(file_path):
     """
     try:
         # Use PyMuPDF to extract images from the PDF
-        docs = convert_from_path(file_path, dpi=300)
+        docs = convert_from_path(file_path, dpi=300, poppler_path=
+                                 os.getenv("POPPLER_PATH", "/usr/bin"))
         
         # Extract text from each page using OCR
         text = ""
