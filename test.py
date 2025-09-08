@@ -84,12 +84,12 @@ st.markdown("""
 
 
 st.markdown(
-    '<p style="font-size:35px; font-weight:bold; color:#002147; text-align:center;">📊 Accounting Assistant</p>',
+    '<p style="font-size:38px; font-weight:bold; color:#FFFFFF; text-align:center;">📊 Accounting Assistant</p>',
     unsafe_allow_html=True
 )
 
 st.markdown(
-    '<p style="font-size:18px; color:#00796B; text-align:center;">Your AI-powered tutor for Financial Accounting & IFRS Standards</p>',
+    '<p style="font-size:20px; color:#00796B; text-align:center;">Your AI-powered tutor for Financial Accounting & IFRS Standards</p>',
     unsafe_allow_html=True
 )
 
@@ -129,7 +129,6 @@ voice_input = st.sidebar.checkbox("🎙 Speak my query")
 voice_output = st.sidebar.checkbox("🔊 Read answer aloud")
 
 
-
 #user inputs - voice or text 
 if voice_input:
     st.write("Voice input selected. Please record your question using the button below.")
@@ -140,11 +139,14 @@ if voice_input:
         st.markdown(f'<div class="user-bubble">You: {query}</div>', unsafe_allow_html=True)
     
 else:
-    query = st.text_input("Enter your question:")
+    query = st.chat_input("Enter your question", key = "prompt", on_submit=None, placeholder="E.g., 'Explain revenue recognition according to IFRS 15'")
     if query:
         st.markdown(f'<div class="user-bubble">You: {query}</div>', unsafe_allow_html=True)
 
-
+#adding a button to submit the query
+if (voice_input and audio) or (not voice_input and query):
+    if st.button("Submit"):
+        pass  # The actual submission is handled below
 
 #handling the query and getting the response from the backend
 if (voice_input and audio) or (not voice_input and query):
