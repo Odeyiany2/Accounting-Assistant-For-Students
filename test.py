@@ -122,62 +122,126 @@ if uploaded_files and st.sidebar.button("Upload"):
         main_app_logger.error(f"Exception during file upload: {e}")
         st.sidebar.error("An error occurred during file upload. Please try again.")
 
-
-
-#voice implementation 
+# Sidebar options
 voice_input = st.sidebar.checkbox("🎙 Speak my query")
 voice_output = st.sidebar.checkbox("🔊 Read answer aloud")
 
+# Show chat history in ChatGPT-style UI
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
 
-#user inputs - voice or text 
+for role, content in st.session_state.chat_history:
+    with st.chat_message(role):
+        st.markdown(content)
+
+query = None
+audio = None
+
+# --- Voice input OR text input ---
 if voice_input:
-    st.write("Voice input selected. Please record your question using the button below.")
+    st.info("🎙 Voice input selected. Record your question below.")
     audio = st.audio_input("Record your question:")
     if audio:
-        #calling the function for speech -> text 
         query = transcibe_audio(audio)
-        st.markdown(f'<div class="user-bubble">You: {query}</div>', unsafe_allow_html=True)
-    
+        # Show user voice query in chat
+        st.session_state.chat_history.append(("user", query))
+        with st.chat_message("user"):
+            st.markdown(query)
 else:
-    query = st.chat_input("Enter your question", key = "prompt", on_submit=None, placeholder="E.g., 'Explain revenue recognition according to IFRS 15'")
+    query = st.chat_input(
+        placeholder="E.g., 'Explain revenue recognition according to IFRS 15'",
+        key="prompt"
+    )
     if query:
-        st.markdown(f'<div class="user-bubble">You: {query}</div>', unsafe_allow_html=True)
+        # Show user text query in chat
+        st.session_state.chat_history.append(("user", query))
+        with st.chat_message("user"):
+            st.markdown(query)
 
-#adding a button to submit the query
-if (voice_input and audio) or (not voice_input and query):
-    if st.button("Submit"):
-        pass  # The actual submission is handled below
-
-#handling the query and getting the response from the backend
-if (voice_input and audio) or (not voice_input and query):
+# --- Handle assistant response ---
+if query:
     try:
         payload = {
             "query": query,
             "session_id": st.session_state.session_id,
-            "history": st.session_state.chat_history
+            "history": st.session_state.chat_history,
         }
         response = requests.post(query_url, json=payload, verify=False)
 
         if response.status_code == 200:
             answer = response.text
 
-            #update chat history
-            st.session_state.chat_history.append(("User", query))
-            st.session_state.chat_history.append(("Assistant", answer))
-
-            #display assistant bubble
-            st.markdown(f'<div class="assistant-bubble">Assistant: {answer}</div>', unsafe_allow_html=True)
-            main_app_logger.info(f"Received answer from assistant: {answer}")
+            # Add assistant response to chat history
+            st.session_state.chat_history.append(("assistant", answer))
+            with st.chat_message("assistant"):
+                st.markdown(answer)
 
             if voice_output:
                 audio_file = text_to_speech(answer)
                 st.audio(audio_file, format="audio/wav")
+
         else:
+            st.error("⚠️ Failed to get response from assistant. Try again!")
             main_app_logger.error(f"Failed to get response from assistant. Status code: {response.status_code}, Response: {response.text}")
-            st.error("Failed to get response from assistant. Please try again.")
+
     except Exception as e:
+        st.error("❌ An error occurred while querying the assistant.")
         main_app_logger.error(f"Exception during querying assistant: {e}")
-        st.error("An error occurred while querying the assistant. Please try again.")
+
+# #voice implementation 
+# voice_input = st.sidebar.checkbox("🎙 Speak my query")
+# voice_output = st.sidebar.checkbox("🔊 Read answer aloud")
+
+
+# #user inputs - voice or text 
+# if voice_input:
+#     st.write("Voice input selected. Please record your question using the button below.")
+#     audio = st.audio_input("Record your question:")
+#     if audio:
+#         #calling the function for speech -> text 
+#         query = transcibe_audio(audio)
+#         st.markdown(f'<div class="user-bubble">You: {query}</div>', unsafe_allow_html=True)
+    
+# else:
+#     query = st.chat_input("Enter your question", key = "prompt", on_submit=None, placeholder="E.g., 'Explain revenue recognition according to IFRS 15'")
+#     if query:
+#         st.markdown(f'<div class="user-bubble">You: {query}</div>', unsafe_allow_html=True)
+
+# #adding a button to submit the query
+# if (voice_input and audio) or (not voice_input and query):
+#     if st.button("Submit"):
+#         pass  # The actual submission is handled below
+
+# #handling the query and getting the response from the backend
+# if (voice_input and audio) or (not voice_input and query):
+#     try:
+#         payload = {
+#             "query": query,
+#             "session_id": st.session_state.session_id,
+#             "history": st.session_state.chat_history
+#         }
+#         response = requests.post(query_url, json=payload, verify=False)
+
+#         if response.status_code == 200:
+#             answer = response.text
+
+#             #update chat history
+#             st.session_state.chat_history.append(("User", query))
+#             st.session_state.chat_history.append(("Assistant", answer))
+
+#             #display assistant bubble
+#             st.markdown(f'<div class="assistant-bubble">Assistant: {answer}</div>', unsafe_allow_html=True)
+#             main_app_logger.info(f"Received answer from assistant: {answer}")
+
+#             if voice_output:
+#                 audio_file = text_to_speech(answer)
+#                 st.audio(audio_file, format="audio/wav")
+#         else:
+#             main_app_logger.error(f"Failed to get response from assistant. Status code: {response.status_code}, Response: {response.text}")
+#             st.error("Failed to get response from assistant. Please try again.")
+#     except Exception as e:
+#         main_app_logger.error(f"Exception during querying assistant: {e}")
+#         st.error("An error occurred while querying the assistant. Please try again.")
 
 
 
