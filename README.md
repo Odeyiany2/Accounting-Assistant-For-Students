@@ -48,3 +48,12 @@ This project is an AI-powered study assistant designed to support accounting stu
     - LangChain: for orchestration.
     - FastAPI: for backend API.
     - Streamlit : for the student-friendly front-end.
+
+## **Features**
+
+✅ Upload course notes, textbooks, or past questions.
+✅ Ask questions via text or speech.
+✅ Get clear, step-by-step explanations.
+✅ Responses grounded in course documents + knowledge base.
+✅ Voice playback of answers.
+✅ Custom UI themed for Accounting students.
