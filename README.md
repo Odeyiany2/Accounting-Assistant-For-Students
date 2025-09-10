@@ -51,6 +51,7 @@ This project is an AI-powered study assistant designed to support accounting stu
 
 ## **Features**
 Below are the features incorporated:
+
 ✅ Upload course notes, textbooks, or past questions.
 
 ✅ Ask questions via text or speech.
