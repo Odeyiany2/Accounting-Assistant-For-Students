@@ -39,7 +39,7 @@ if index_name not in pc.list_indexes().names():
                           spec=ServerlessSpec(
                               cloud= "aws",
                               region ="us-east-1"
-                          ))
+                          ), timeout= 10)
 else:
     embedding_vec_logger.info(f"Index {index_name} already exists.")
 
@@ -115,7 +115,8 @@ chunked_docs = chunk_docs(all_docs)
 doc_store  = PineconeVectorStore.from_documents(chunked_docs, 
                                      embedding_model, 
                                      index_name = index_name,
-                                     namespace = "financial_accounting")
+                                     namespace = "financial_accounting"
+                                     )
 
 
 
