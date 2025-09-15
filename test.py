@@ -14,84 +14,90 @@ st.set_page_config(
 )
 
 #custom CSS (background + sidebar + chat bubbles)
-st.markdown("""
+
+page_bg_img = """
 <style>
-            /* Main Background with custom transparent image */
-            .stApp {{
-                background: url("file:///C:/Projects_ML/Accounting-Assistant-For-Students/Streamlit%20background.png") repeat;
-                background-size: cover;
-                background-position: center;
-                background-attachment: fixed;
-                background-color: #f5f7fa;
-            }}
-            /* Sidebar customization */
-            section[data-testid="stSidebar"] {{
-                background-color:  #002147; /* navy */
-                color: white;
-                padding: 20px;
-                border-radius: 10px;
-            }}
-            section[data-testid="stSidebar"] * {{
-                color: white !important;
-            }}
+[data-testid = "stAppViewContainer"]{
+    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+    background-size: cover;
+    background-attachment: fixed;
+}
+[data-testid="stAppViewContainer"] .body, p, h1, h4, h2, h3, h5, h6 {
+    color: black !important;
+    font-family: 'Arial', sans-serif;
+}
 
-            /* Title and Subtitle */
-            .title {{
-                font-size: 35px;
-                font-weight: bold;
-                color: #002147; /* navy */
-                text-align: center;
-                margin-bottom: 0;
-                font-family: 'Arial Black', sans-serif;}}
-            
-            .subtitle {{
-                font-size: 18px;
-                color: #00796B;
-                text-align: center;
-                margin-top: 0;
-                font-family: 'Arial', sans-serif;}}
-            
-            /* Chat bubbles */
-            .user-bubble {{
-                background-color: #00796B;
-                color: white;
-                padding: 10px;
-                border-radius: 15px;
-                margin: 5px 0px;
-                width: fit-content;}}
-            
-            .assistant-bubble {{
-                background-color: #e0e0e0;
-                color: black;
-                padding: 10px;
-                border-radius: 15px;
-                margin: 5px 0px;
-                width: fit-content;
-            }}
+[data-testid="stHeader"] {
+    background: rgba(0,0,0,0);
+}
+[data-testid="stSidebar"] {
+    background: #ffe3e3;  /* soft blush pink */
+    color: black;
+    font-family: 'Arial', sans-serif;
+    padding: 15px;
+    border-radius: 12px;
+}
 
-            /* Footer */
-            .footer {{
-                font-size: 13px;
-                color: gray;
-                text-align: center;
-                margin-top: 20px;
-                padding-top: 30px;
-                font-family: 'Arial', sans-serif;}}
-            </style>
+/*Title and Subtitle */
+.title {
+    font-size: 36px;
+    font-weight: bold;
+    color: #D32F2F;  /* deep red */
+    text-align: center;
+    margin-bottom: 0;
+    font-family: 'Arial Black', sans-serif;
+}
+.subtitle {
+    font-size: 18px;
+    color: #6d4c41;  /* warm brown */
+    text-align: center;
+    margin-top: 0;
+    font-family: 'Arial', sans-serif;
+}
 
-""", unsafe_allow_html=True)
+/* Chat bubbles */ 
+.user-bubble {
+    background: linear-gradient(135deg, #ff758c, #ff7eb3);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 18px;
+    margin: 8px 0;
+    width: fit-content;
+    max-width: 75%;
+    font-family: 'Arial', sans-serif;
+}
+.assistant-bubble {
+    background: #fff3f3;
+    color: #2e2e2e;
+    padding: 10px 15px;
+    border-radius: 18px;
+    margin: 8px 0;
+    width: fit-content;
+    max-width: 75%;
+    border: 1px solid #ffd1d1;
+}
+/* Footer */
+.footer {
+    font-size: 13px;
+    color: #6d4c41;
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+}
+</style>
+"""
+st.markdown(page_bg_img, unsafe_allow_html=True)
+
+# ---Page Title and Subtitle ---
+st.title("📊 Accounting Assistant")
+st.write("Your AI-powered tutor for Financial Accounting & IFRS Standards")
+
+# ---Sidebar for document upload and options ---
+st.sidebar.subheader("Upload your Accounting Documents")
+st.sidebar.write("Upload class notes, textbooks, or past questions (PDF, DOCX, TXT, Images)" \
+" to get tailored assistance.")
 
 
-
-st.markdown(
-    '<p style="font-size:38px; font-weight:bold; color:#FFFFFF; text-align:center;">📊 Accounting Assistant</p>',
-    unsafe_allow_html=True
-)
-
-st.markdown(
-    '<p style="font-size:20px; color:#00796B; text-align:center;">Your AI-powered tutor for Financial Accounting & IFRS Standards</p>',
-    unsafe_allow_html=True
-)
 
 #session state 
 if "chat_history" not in st.session_state:
