@@ -84,18 +84,14 @@ page_bg_img = """
     margin-top: 30px;
     padding-top: 20px;
 }
+
 </style>
 """
 st.markdown(page_bg_img, unsafe_allow_html=True)
 
 # ---Page Title and Subtitle ---
 st.title("📊 Accounting Assistant")
-st.write("Your AI-powered tutor for Financial Accounting & IFRS Standards")
-
-# ---Sidebar for document upload and options ---
-st.sidebar.subheader("Upload your Accounting Documents")
-st.sidebar.write("Upload class notes, textbooks, or past questions (PDF, DOCX, TXT, Images)" \
-" to get tailored assistance.")
+st.write("*Your AI-powered tutor for Financial Accounting & IFRS Standards*")
 
 
 
@@ -106,7 +102,7 @@ if "session_id" not in st.session_state:
     st.session_state.session_id = None
 
 #document upload section
-st.sidebar.subheader("Upload your Accounting Documents")
+st.sidebar.subheader("✨ Upload your Accounting Documents")
 uploaded_files = st.sidebar.file_uploader("Upload class notes, textbooks, or past questions (PDF, DOCX, TXT, Images)",
     type=["pdf", "docx", "txt", "png", "jpg", "jpeg"],
     accept_multiple_files=True)
@@ -194,60 +190,6 @@ if query:
         st.error("❌ An error occurred while querying the assistant.")
         main_app_logger.error(f"Exception during querying assistant: {e}")
 
-# #voice implementation 
-# voice_input = st.sidebar.checkbox("🎙 Speak my query")
-# voice_output = st.sidebar.checkbox("🔊 Read answer aloud")
-
-
-# #user inputs - voice or text 
-# if voice_input:
-#     st.write("Voice input selected. Please record your question using the button below.")
-#     audio = st.audio_input("Record your question:")
-#     if audio:
-#         #calling the function for speech -> text 
-#         query = transcibe_audio(audio)
-#         st.markdown(f'<div class="user-bubble">You: {query}</div>', unsafe_allow_html=True)
-    
-# else:
-#     query = st.chat_input("Enter your question", key = "prompt", on_submit=None, placeholder="E.g., 'Explain revenue recognition according to IFRS 15'")
-#     if query:
-#         st.markdown(f'<div class="user-bubble">You: {query}</div>', unsafe_allow_html=True)
-
-# #adding a button to submit the query
-# if (voice_input and audio) or (not voice_input and query):
-#     if st.button("Submit"):
-#         pass  # The actual submission is handled below
-
-# #handling the query and getting the response from the backend
-# if (voice_input and audio) or (not voice_input and query):
-#     try:
-#         payload = {
-#             "query": query,
-#             "session_id": st.session_state.session_id,
-#             "history": st.session_state.chat_history
-#         }
-#         response = requests.post(query_url, json=payload, verify=False)
-
-#         if response.status_code == 200:
-#             answer = response.text
-
-#             #update chat history
-#             st.session_state.chat_history.append(("User", query))
-#             st.session_state.chat_history.append(("Assistant", answer))
-
-#             #display assistant bubble
-#             st.markdown(f'<div class="assistant-bubble">Assistant: {answer}</div>', unsafe_allow_html=True)
-#             main_app_logger.info(f"Received answer from assistant: {answer}")
-
-#             if voice_output:
-#                 audio_file = text_to_speech(answer)
-#                 st.audio(audio_file, format="audio/wav")
-#         else:
-#             main_app_logger.error(f"Failed to get response from assistant. Status code: {response.status_code}, Response: {response.text}")
-#             st.error("Failed to get response from assistant. Please try again.")
-#     except Exception as e:
-#         main_app_logger.error(f"Exception during querying assistant: {e}")
-#         st.error("An error occurred while querying the assistant. Please try again.")
 
 
 
@@ -256,6 +198,7 @@ if query:
 
 
 
+# st.write("---")
 
-
-st.markdown('<p class = "footer"> Built with ❤️ by Miriam Odeyiany • University of Lagos</p>', unsafe_allow_html=True)
+# st.markdown("Built with ❤️ by Miriam Odeyiany • University of Lagos © 2025")
+# st.markdown("Find the project on [GitHub](https://github.com/Odeyiany2/Accounting-Assistant-For-Students)")
