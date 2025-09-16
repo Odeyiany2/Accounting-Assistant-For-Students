@@ -4,8 +4,8 @@ from assistant_core.voice_input import transcibe_audio, text_to_speech
 from config.logging import main_app_logger
 
 #backend urls
-query_url = "https://127.0.0.1:5000/query"
-upload_url = "https://127.0.0.1:5000/upload"
+query_url = "http://127.0.0.1:5000/query"
+upload_url = "http://127.0.0.1:5000/upload"
 
 st.set_page_config(
     page_title="Accounting Assistant",

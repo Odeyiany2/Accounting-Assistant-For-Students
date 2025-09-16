@@ -112,7 +112,7 @@ def ask_assistant(question:str, course:str = None, chat_history:list = [], uploa
         try:
             history_aware_retriever = create_history_aware_retriever(
                 retriever=combine_retriever,
-                history_length=5,  #number of previous interactions to consider
+                # history_length=5,  #number of previous interactions to consider
                 llm=model,  #use the Groq model for retrieval
                 prompt=ChatPromptTemplate.from_template(
                     "You are an expert accounting tutor. "
@@ -161,7 +161,6 @@ def ask_assistant(question:str, course:str = None, chat_history:list = [], uploa
                 llm=model,
                 prompt=RAFT_prompt,
                 document_variable_name="context",
-                return_source_documents=True
             )
             retriever_prompt_logger.info("Document chain created successfully.")
         except Exception as e:
