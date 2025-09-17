@@ -172,7 +172,7 @@ def ask_assistant(question:str, course:str = None, chat_history:list = [], uploa
             retriever_prompt_logger.info("Creating retrieval chain.")
             retrieval_chain = create_retrieval_chain(
                 retriever=history_aware_retriever,
-                document_chain=document_chain,
+                combine_docs_chain=document_chain,
                 return_source_documents=True
             )
 
