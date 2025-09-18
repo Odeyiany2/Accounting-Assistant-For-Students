@@ -179,8 +179,8 @@ if query:
                 st.markdown(answer)
 
             if voice_output:
-                audio_file = text_to_speech(answer)
-                st.audio(audio_file, format="audio/wav")
+                text_to_speech(answer)
+                #st.audio(audio_file, format="audio/wav")
 
         else:
             st.error("⚠️ Failed to get response from assistant. Try again!")
