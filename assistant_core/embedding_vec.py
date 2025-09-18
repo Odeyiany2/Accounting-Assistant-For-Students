@@ -121,7 +121,7 @@ doc_store  = PineconeVectorStore.from_documents(chunked_docs,
 
 
 #temporary storage for user uploaded documents
-def build_temp_doc_store(uploaded_docs: List[Document]) -> Pinecone:
+def build_temp_doc_store(uploaded_docs: List[Document]) -> Chroma:
     """
     Build a temporary in-memory Chroma vector store for user-uploaded documents.
     This avoids polluting the main Pinecone index with temporary data.
@@ -130,7 +130,7 @@ def build_temp_doc_store(uploaded_docs: List[Document]) -> Pinecone:
         uploaded_docs (List[Document]): List of user-uploaded documents.
     
     Returns:
-        Pinecone: Pinecone vector store containing embeddings of the uploaded documents.
+        Chroma: Chroma vector store containing embeddings of the uploaded documents.
     """
     try:
         if not uploaded_docs:
