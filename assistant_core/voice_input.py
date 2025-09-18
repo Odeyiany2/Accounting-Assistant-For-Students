@@ -52,6 +52,8 @@ def text_to_speech(text:str, output_file:str = "output.mp3") -> str:
     try:
         #initialize the engine 
         engine = pyttsx3.init()
+        #don't save to file
+        #engine.save_to_file(text, output_file)
         engine.save_to_file(text, output_file)
         engine.runAndWait()
         voice_handler_logger.info(f"Text to speech conversion successful: {output_file}")
