@@ -1,6 +1,7 @@
 #fastapi implementation
 import uvicorn 
 import uuid
+import re
 from fastapi import FastAPI, HTTPException, Request, File, UploadFile
 from typing import List
 from fastapi.responses import JSONResponse, PlainTextResponse
@@ -101,8 +102,11 @@ async def query_chatbot(request:Request):
             fastapi_app_logger.error("No response from the assistant")
             raise HTTPException(status_code=500, detail="No response from the assistant")
         
+        #return cleaned up response without thinking steps 
+        clean_response = re.sub(r"<think>.*?</think>", "", response, flags=re.DOTALL).strip()
+        
         #returning the response as plain text
-        return PlainTextResponse(content=response, status_code=200)
+        return PlainTextResponse(content=clean_response, status_code=200)
         
     except HTTPException as http_exc:
         fastapi_app_logger.error(f"HTTP Exception: {http_exc.detail}")
