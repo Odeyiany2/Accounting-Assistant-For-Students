@@ -2,6 +2,8 @@
 import speech_recognition as sr
 import os 
 import pyttsx3
+from io import BytesIO
+from gtts import gTTS
 from pydub import AudioSegment
 from config.logging import voice_handler_logger
 
@@ -45,7 +47,7 @@ def transcibe_audio(audio_file:str) -> str:
 
 
 #text to speech function 
-def text_to_speech(text:str, output_file:str = "output.mp3") -> str:
+def text_to_speech(text:str) -> str:
     """
     Converts the response to a speech audio file using pyttsx3
     """
@@ -56,8 +58,7 @@ def text_to_speech(text:str, output_file:str = "output.mp3") -> str:
         engine.say(text)
         #engine.save_to_file(text, output_file)
         engine.runAndWait()
-        voice_handler_logger.info(f"Text to speech conversion successful: {output_file}")
-        return output_file
+        voice_handler_logger.info(f"Text to speech conversion successful")
     except Exception as e:
         voice_handler_logger.error(f"Error in text to speech conversion: {e}")
         raise e
