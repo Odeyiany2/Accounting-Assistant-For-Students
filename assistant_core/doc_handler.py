@@ -9,7 +9,6 @@ from typing import List
 from pathlib import Path
 from langchain_community.document_loaders import TextLoader, PyMuPDFLoader, Docx2txtLoader#langchain wrapper for loading documents from a directory
 from langchain_community.document_loaders.image import UnstructuredImageLoader
-from langchain_core.prompts import ChatPromptTemplate
 from langchain.docstore.document import Document
 from pdf2image import convert_from_path
 from PIL import Image
@@ -17,7 +16,7 @@ from config.logging import doc_handler_logger
 
 
 
-#check if a pdf contains scanned images 
+#check if a pdf contains scanned images r
 def is_scanned_pdf(file_path):
     """
     Checks if a PDF file contains scanned images

@@ -1,9 +1,9 @@
 #voice implementation
 import speech_recognition as sr
-import os 
+#import os 
 import pyttsx3
-from io import BytesIO
-from gtts import gTTS
+# from io import BytesIO
+# from gtts import gTTS
 from pydub import AudioSegment
 from config.logging import voice_handler_logger
 

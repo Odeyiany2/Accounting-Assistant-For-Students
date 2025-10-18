@@ -34,16 +34,18 @@ if not tavily_api_key:
 tavily_client = TavilyClient(tavily_api_key)
 
 #set up the Groq model
-model = ChatGroq(api_key=groq_api_key, model="deepseek-r1-distill-llama-70b", temperature=0.3)
+model = ChatGroq(api_key=groq_api_key, model="deepseek-r1-distill-llama-70b", temperature=0.1)
 
-#RAFT Prompting 
-RAFT_prompt = ChatPromptTemplate.from_template("""
+#Prompting 
+prompt = ChatPromptTemplate.from_template("""
 You are an expert **Financial Accounting tutor**. 
 Your job is to help students understand topics by providing step-by-step, clear, and correct explanations.
 
 Rules:
 - Answer **only Financial Accounting questions** (ignore Finance, Managerial, Business).
 - Use IFRS or IAS standards where applicable. Mention the specific standard if relevant.
+- Include short examples and a one-line analogy when helpful.
+- Provide exact references to local docs used (filename or id) and web sources.                                           
 - If asked to prepare accounts, use **vertical format**.
 - If the answer is not in your knowledge base, apologize and search the web using reliable sources 
   (IFRS.org, IASB, ACCA, ICAN, Investopedia, academic references). Provide the source link.
@@ -64,6 +66,18 @@ Rules:
 
 ## Answer:
 <final, clear explanation or prepared statement>
+
+## Return Structure:
+- useful_documents:
+- reasoning:
+- answer_text:
+- financial_statements:
+- calculations:
+- example:
+- analogy:
+- references:
+- sources_used_urls:
+- notes:
 """)
 
 #Web search fallback function 
@@ -159,7 +173,7 @@ def ask_assistant(question:str, course:str = None, chat_history:list = [], uploa
             retriever_prompt_logger.info("Creating document chain for retrieval.")
             document_chain = create_stuff_documents_chain(
                 llm=model,
-                prompt=RAFT_prompt,
+                prompt=prompt,
                 document_variable_name="context",
             )
             retriever_prompt_logger.info("Document chain created successfully.")
