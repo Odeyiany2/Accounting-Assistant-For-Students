@@ -10,7 +10,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter #langchain wr
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_pinecone import PineconeVectorStore
-from assistant_core.doc_handler import load_documents_from_directory
+from assistant_core.doc_handler_azure import load_documents_from_directory
 from config.logging import embedding_vec_logger
 
 

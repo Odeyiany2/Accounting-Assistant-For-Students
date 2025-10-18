@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel
 from config.logging import fastapi_app_logger
 from assistant_core.retriever_prompt import ask_assistant
-from assistant_core.doc_handler import load_documents_from_upload
+from assistant_core.doc_handler_azure import load_documents_from_upload
 
 
 #creating the fastapi instance
