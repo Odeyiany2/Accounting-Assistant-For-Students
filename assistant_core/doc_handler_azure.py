@@ -7,7 +7,6 @@ from langchain_community.document_loaders import TextLoader, PyMuPDFLoader, Docx
 from langchain.docstore.document import Document
 from typing import List
 from pathlib import Path
-
 from config.logging import doc_handler_logger
 
 #load the environment variables

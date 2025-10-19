@@ -7,7 +7,7 @@ import pytesseract
 import tempfile
 from typing import List
 from pathlib import Path
-from langchain_community.document_loaders import TextLoader, PyMuPDFLoader, Docx2txtLoader#langchain wrapper for loading documents from a directory
+from langchain_community.document_loaders import TextLoader, PyMuPDFLoader, Docx2txtLoader
 from langchain_community.document_loaders.image import UnstructuredImageLoader
 from langchain.docstore.document import Document
 from pdf2image import convert_from_path
