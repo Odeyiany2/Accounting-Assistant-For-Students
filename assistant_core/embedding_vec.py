@@ -45,7 +45,7 @@ else:
 
 
 #function for chunking 
-def chunk_docs(docs: List[Document], chunk_size: int = 800, chunk_overlap: int = 150) -> List[Document]:
+def chunk_docs(docs: List[Document], chunk_size: int = 700, chunk_overlap: int = 100) -> List[Document]:
     """
     This function is used to chunk documents into smaller pieces for embedding. 
     It uses langchain's RecursiveCharacterTextSplitter to split the loaded documents into smaller chunks
@@ -74,6 +74,34 @@ def chunk_docs(docs: List[Document], chunk_size: int = 800, chunk_overlap: int =
     except Exception as e:
         embedding_vec_logger.error(f"Error in chunking documents: {e}")
         raise e
+    
+
+def upsert_in_batches(docs, embedding, batch_size = 50, **kwargs):
+    """
+    Upserts documents into Pinecone index in batches to avoid request size limits.
+
+    Args:
+        docs (List[Document]): List of documents to be upserted.
+        embedding: Embedding model to use.
+        batch_size (int): Number of documents to upsert in each batch.
+        **kwargs: Additional arguments for PineconeVectorStore.
+    """
+    try:
+        all_stores = []
+        total_docs = len(docs)
+        for i in range(0, total_docs, batch_size):
+            batch_docs = docs[i:i + batch_size]
+            vector_store = PineconeVectorStore.from_documents(
+                batch_docs,
+                embedding,
+                **kwargs
+            )
+            all_stores.append(vector_store)
+            embedding_vec_logger.info(f"Upserted batch {i // batch_size + 1} containing {len(batch_docs)} documents.")
+    except Exception as e:
+        embedding_vec_logger.error(f"Error during batched upsert: {e}")
+        raise e
+    
 
 #embedding model 
 embedding_model = HuggingFaceBgeEmbeddings(
@@ -112,11 +140,16 @@ chunked_docs = chunk_docs(all_docs)
 
 
 #push to pinecone index
-doc_store  = PineconeVectorStore.from_documents(chunked_docs, 
-                                     embedding_model, 
-                                     index_name = index_name,
-                                     namespace = "financial_accounting"
-                                     )
+# #doc_store  = PineconeVectorStore.from_documents(chunked_docs, 
+#                                      embedding_model, 
+#                                      index_name = index_name,
+#                                      namespace = "financial_accounting"
+#                                      )
+
+doc_store = upsert_in_batches(chunked_docs, 
+                              embedding_model,
+                              name_space = "financial_accounting",
+                              index_name = index_name)
 
 
 
