@@ -85,7 +85,7 @@ def load_documents_from_directory(directory_path:str) -> List[Document]:
     for subdir, _, files in os.walk(directory_path):
         subject = Path(subdir).name
         for file in files:
-            file_path = os.join(subdir, file)
+            file_path = os.path.join(subdir, file)
             ext = os.path.splitext(file)[1].lower()
 
             try:
