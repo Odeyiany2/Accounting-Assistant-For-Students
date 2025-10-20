@@ -148,7 +148,7 @@ chunked_docs = chunk_docs(all_docs)
 
 doc_store = upsert_in_batches(chunked_docs, 
                               embedding_model,
-                              name_space = "financial_accounting",
+                              namespace = "financial_accounting",
                               index_name = index_name)
 
 
