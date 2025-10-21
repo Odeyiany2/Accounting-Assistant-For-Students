@@ -34,14 +34,14 @@ def extract_text_with_azure(file_path:str):
     """
     try:
         with open(file_path, "rb") as f:
-            poller = client.begin_analyze_document("prebuilt-layout", document = f)
+            poller = client.begin_analyze_document("prebuilt-layout", f)
         result = poller.result()
 
         text_block = []
         for result in result.pages:
             doc_handler_logger.info(f"Page {result.page_number} has width {result.width} and height {result.height}, measured in {result.unit}.")
             for line in result.lines:
-                doc_handler_logger.info(f"Line: '{line.content}'")
+                #doc_handler_logger.info(f"Line: '{line.content}'")
                 text_block.append(line.content)
         
         full_text = "\n".join(text_block)

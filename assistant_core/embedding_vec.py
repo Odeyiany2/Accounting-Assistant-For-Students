@@ -137,10 +137,13 @@ for course, path in course_dir.items():
 
 #chunk the documents into smaller pieces
 chunked_docs = chunk_docs(all_docs)
+if not chunked_docs:
+    embedding_vec_logger.warning("No documents were provided for vector store creation.")
 
 
-#push to pinecone index
-# #doc_store  = PineconeVectorStore.from_documents(chunked_docs, 
+
+# #push to pinecone index
+# doc_store  = PineconeVectorStore.from_documents(chunked_docs, 
 #                                      embedding_model, 
 #                                      index_name = index_name,
 #                                      namespace = "financial_accounting"

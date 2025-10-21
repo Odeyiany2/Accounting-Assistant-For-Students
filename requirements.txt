@@ -5,7 +5,7 @@ altair==5.5.0
 annotated-types==0.7.0
 anyio==4.9.0
 attrs==25.3.0
-azure-ai-documentintelligence==1.0.0b4
+azure-ai-documentintelligence==1.0.0
 azure-core==1.36.0
 backoff==2.2.1
 bcrypt==4.3.0
