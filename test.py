@@ -22,7 +22,7 @@ page_bg_img = """
     background-size: cover;
     background-attachment: fixed;
 }
-[data-testid="stAppViewContainer"] .body, p, h1, h4, h2, h3, h5, h6 {
+[data-testid="stAppViewContainer"] .body, p, h1, h4, h2, h3, h5, h6, h7{
     color: black !important;
     font-family: 'Arial', sans-serif;
 }
