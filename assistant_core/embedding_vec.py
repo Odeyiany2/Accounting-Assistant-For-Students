@@ -98,6 +98,7 @@ def upsert_in_batches(docs, embedding, batch_size = 50, **kwargs):
             )
             all_stores.append(vector_store)
             embedding_vec_logger.info(f"Upserted batch {i // batch_size + 1} containing {len(batch_docs)} documents.")
+            return all_stores[0] if all_stores else None
     except Exception as e:
         embedding_vec_logger.error(f"Error during batched upsert: {e}")
         raise e

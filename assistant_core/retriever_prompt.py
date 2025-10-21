@@ -6,10 +6,7 @@ from langchain.chains.retrieval import create_retrieval_chain
 from langchain.chains.history_aware_retriever import create_history_aware_retriever
 from langchain.retrievers import EnsembleRetriever
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.messages import HumanMessage
-from langchain_core.documents import Document
 from dotenv import load_dotenv
-from groq import Groq #language model wrapper for Groq API
 from langchain_groq import ChatGroq
 from config.logging import retriever_prompt_logger
 from assistant_core.embedding_vec import doc_store, build_temp_doc_store
