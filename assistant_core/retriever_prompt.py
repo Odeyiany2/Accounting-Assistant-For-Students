@@ -64,7 +64,9 @@ Rules:
 ---
 
 ### Explanation:
-<Provide a clear, logically structured breakdown of how to approach and understand the topic or solve the problem.>
+<Provide a clear, logically structured breakdown of how to approach and understand the topic or solve the problem.
+or provide a detailed and indepth explanation of the topi or problem if asked>
+
 
 ### 💡 Example
 <Provide a short, relevant accounting example — e.g., a journal entry, adjustment scenario, or simple illustration.>
@@ -78,16 +80,15 @@ Rules:
 
 ### 🔗 References & Provenance
 - local_documents_used:
-  - - filename: "<document name>"
-    - section_or_page: "<optional section/page>"
+  - - filename: <document name>
+    - section_or_page: <optional section/page>
 - sources_used_urls:
-  - - url: "https://..."
-    - title: "Short title or publisher"
-    - valid: true | false
-    - notes: "Why this source was used / reliability comment"
+  - - url: https://...
+    - title: Short title or publisher
+    - notes: Why this source was used / reliability comment
 - reasoning_summary: <Short summary of how the above sources support the explanation.>
 
-### 💭 Suggested Follow-up
+#### 💭 Suggested Follow-up
 <One or two short follow-up questions the student might ask next.>
 """)
 

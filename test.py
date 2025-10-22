@@ -22,9 +22,14 @@ page_bg_img = """
     background-size: cover;
     background-attachment: fixed;
 }
-[data-testid="stAppViewContainer"] .body, p, h1, h4, h2, h3, h5, h6, h7{
+[data-testid="stAppViewContainer"] .body, p, h1, h4, h2, h3, h5, h6, li, span, div {
     color: black !important;
     font-family: 'Arial', sans-serif;
+}
+
+/* All markdown and text elements */
+p, h1, h2, h3, h4, h5, h6, li, span, div {
+    color: black !important;
 }
 
 [data-testid="stHeader"] {
